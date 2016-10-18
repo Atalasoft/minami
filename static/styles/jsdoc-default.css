@@ -599,3 +599,25 @@ dl.param-type {
     width: 100%;
   }
 }
+
+li .deprecated a {
+  color: #950B02;
+}
+
+li[data-type='method'] { 
+  background-image:url(images/dull-red-circle.png);
+  background-repeat:no-repeat;
+  background-position:0px 0px
+}
+
+li[data-type='event'] {
+  background-image:url(images/dull-green-circle.png);
+  background-repeat:no-repeat;
+  background-position:0px 0px
+}
+
+li[data-type='member'] {
+  background-image:url(images/dull-blue-circle.png);
+  background-repeat:no-repeat;
+  background-position:0px 0px
+}
