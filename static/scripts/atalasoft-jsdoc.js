@@ -1,6 +1,6 @@
 $(function () {
     // Search Items
-    $('#search').on('keyup search', function (e) {
+    $('nav .search').on('keyup search', function (e) {
         var value = $(this).val();
         var $el = $('nav');
 
