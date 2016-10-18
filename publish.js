@@ -298,9 +298,11 @@ function buildMemberNav(items, itemHeading, itemsSeen, linktoFn) {
         items.forEach(function(item) {
             var methods = find({kind:'function', memberof: item.longname});
             var members = find({kind:'member', memberof: item.longname});
+            var events = find({kind:'event', memberof: item.longname});
 
             if ( !hasOwnProp.call(item, 'longname') ) {
-                itemsNav += '<li>' + linktoFn('', item.name);
+                itemsNav += '<li class="item">';
+                itemsNav += linktoFn('', item.name);
                 itemsNav += '</li>';
             } else if ( !hasOwnProp.call(itemsSeen, item.longname) ) {
                 var displayName;
@@ -317,18 +319,77 @@ function buildMemberNav(items, itemHeading, itemsSeen, linktoFn) {
                     displayName = item.name;
                 }
 
-                itemsNav += '<li>' + linktoFn(item.longname, displayName.replace(/^module:/g, ''));
+                itemsNav += '<li class="item">';
+                itemsNav += linktoFn(item.longname, displayName.replace(/^module:/g, ''));
                 if (methods.length) {
                     itemsNav += "<ul class='methods'>";
 
                     methods.forEach(function (method) {
-                        itemsNav += "<li data-type='method'>";
-                        itemsNav += linkto(method.longname, method.name);
-                        itemsNav += "</li>";
+                        if (!method.deprecated && !method.inherited) {
+                            itemsNav += "<li data-type='method' data-name='" + method.longname + "' >";
+                            itemsNav += linkto(method.longname, method.name);
+                            itemsNav += "</li>";
+                        }
+                    });
+
+                    // TODO: do it in one cycle
+                    methods.forEach(function (method) {
+                        if (method.deprecated && !method.inherited) {
+                            itemsNav += "<li data-type='method' class='deprecated' data-name='" + method.longname + "' >";
+                            itemsNav += linkto(method.longname, method.name);
+                            itemsNav += "</li>";
+                        }
                     });
 
                     itemsNav += "</ul>";
                 }
+
+                if (events.length) {
+                    itemsNav += "<ul class='events'>";
+
+                    events.forEach(function (event) {
+                        if (!event.deprecated && !event.inherited) {
+                            itemsNav += "<li data-type='event' data-name='" + event.longname + "' >";
+                            itemsNav += linkto(event.longname, event.name);
+                            itemsNav += "</li>";
+                        }
+                    });
+
+                    // TODO: do it in one cycle
+                    events.forEach(function (event) {
+                        if (event.deprecated && !event.inherited) {
+                            itemsNav += "<li data-type='event' class='deprecated' data-name='" + event.longname + "' >";
+                            itemsNav += linkto(event.longname, event.name);
+                            itemsNav += "</li>";
+                        }
+                    });
+
+                    itemsNav += "</ul>";
+                }
+
+                if (members.length) {
+                    itemsNav += "<ul class='members'>";
+
+                    members.forEach(function (member) {
+                        if (!member.deprecated && !member.inherited) {
+                            itemsNav += "<li data-type='member' data-name='" + member.longname + "' >";
+                            itemsNav += linkto(member.longname, member.name);
+                            itemsNav += "</li>";
+                        }
+                    });
+
+                    // TODO: do it in one cycle
+                    members.forEach(function (member) {
+                        if (member.deprecated && !member.inherited) {
+                            itemsNav += "<li data-type='member' class='deprecated' data-name='" + member.longname + "' >";
+                            itemsNav += linkto(member.longname, member.name);
+                            itemsNav += "</li>";
+                        }
+                    });
+
+                    itemsNav += "</ul>";
+                }
+
                 itemsNav += '</li>';
                 itemsSeen[item.longname] = true;
             }
@@ -573,8 +634,8 @@ exports.publish = function(taffyData, opts, tutorials) {
     members.tutorials = tutorials.children;
 
     // output pretty-printed source files by default
-    var outputSourceFiles = conf.default && conf.default.outputSourceFiles !== false 
-        ? true 
+    var outputSourceFiles = conf.default && conf.default.outputSourceFiles !== false
+        ? true
         : false;
 
     // add template helpers
@@ -594,8 +655,8 @@ exports.publish = function(taffyData, opts, tutorials) {
         generateSourceFiles(sourceFiles, opts.encoding);
     }
 
-    if (members.globals.length) { 
-        generate('', 'Global', [{kind: 'globalobj'}], globalUrl); 
+    if (members.globals.length) {
+        generate('', 'Global', [{kind: 'globalobj'}], globalUrl);
     }
 
     // index page displays information from package.json and lists files
@@ -672,6 +733,6 @@ exports.publish = function(taffyData, opts, tutorials) {
             saveChildren(child);
         });
     }
-    
+
     saveChildren(tutorials);
 };
