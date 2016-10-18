@@ -621,3 +621,12 @@ li[data-type='member'] {
   background-repeat:no-repeat;
   background-position:0px 0px
 }
+
+.description table {
+  border-collapse: collapse;
+}
+
+.description td, 
+.description th { 
+  border: 1px solid #CCC; 
+} 
