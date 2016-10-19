@@ -642,3 +642,8 @@ nav .search {
   width: 100%;
   margin-top: 20px;
 }
+
+dt.tag-todo {
+  color: #950B02;
+  font-weight: bold;
+}
