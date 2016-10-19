@@ -5,7 +5,7 @@ A clean, responsive documentation template theme for JSDoc 3.
 Slightly modified version of original [Minami](https://github.com/Nijikokun/minami) template to 
 better fit Atalasoft documentation style.
 
-![Minami Screenshot](http://puu.sh/gOyNe/66c3adcb97.png)
+![Minami Screenshot](preview.png)
 
 ## Uses
 
