@@ -390,13 +390,20 @@ function buildMemberNav(items, itemHeading, itemsSeen, linktoFn) {
                     itemsNav += "</ul>";
                 }
 
-                itemsNav += '</li>';
                 itemsSeen[item.longname] = true;
+                if (item.children){
+                    itemsNav += buildMemberNav(item.children, null, itemsSeen, linktoFn);
+                }
+
+                itemsNav += '</li>';
             }
         });
 
         if (itemsNav !== '') {
-            nav += '<h3>' + itemHeading + '</h3><ul>' + itemsNav + '</ul>';
+            if (itemHeading) {
+                nav += '<h3>' + itemHeading + '</h3>';
+            }
+            nav += '<ul>' + itemsNav + '</ul>';
         }
     }
 
