@@ -65,10 +65,12 @@
         var self = this;
         props.forEach(function(prop) {
             if (!prop) { return; }
+
+        let idAttribute = !!prop.id ? `id="${prop.id}"` : '';
     ?>
 
-        <tr>
-            <?js if (props.hasName) {?>
+        <tr <?js= idAttribute ?>>
+            <?js if (props.hasName) {  ?>
                 <td class="name"><code><?js= prop.name ?></code></td>
             <?js } ?>
 

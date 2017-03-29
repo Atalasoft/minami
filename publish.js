@@ -430,6 +430,7 @@ function linktoExternal(longName, name) {
  * @param {array<object>} members.tutorials
  * @param {array<object>} members.events
  * @param {array<object>} members.interfaces
+ * @param {array<object>} members.configurations
  * @return {string} The HTML for the navigation sidebar.
  */
 function buildNav(members) {
@@ -441,6 +442,7 @@ function buildNav(members) {
     nav += buildMemberNav(members.namespaces, 'Namespaces', seen, linkto);
     nav += buildMemberNav(members.classes, 'Classes', seen, linkto);
     nav += buildMemberNav(members.modules, 'Modules', {}, linkto);
+    nav += buildMemberNav(members.configurations, env.conf.templates.default.atalaconfigHeader || 'Definitions', seen, linkto);
     nav += buildMemberNav(members.externals, 'Externals', seen, linktoExternal);
     // nav += buildMemberNav(members.events, 'Events', seen, linkto);
     nav += buildMemberNav(members.mixins, 'Mixins', seen, linkto);
@@ -638,6 +640,10 @@ exports.publish = function(taffyData, opts, tutorials) {
     });
 
     var members = helper.getMembers(data);
+    members.classes = helper.find(taffy(members.classes), function() {
+        return !this.atalaconfig;
+    });
+    members.configurations = helper.find(data, { atalaconfig: true } );
     members.tutorials = tutorials.children;
 
     // output pretty-printed source files by default
@@ -683,6 +689,7 @@ exports.publish = function(taffyData, opts, tutorials) {
     var mixins = taffy(members.mixins);
     var externals = taffy(members.externals);
     var interfaces = taffy(members.interfaces);
+    var configs = taffy(members.configurations);
 
     Object.keys(helper.longnameToUrl).forEach(function(longname) {
         var myModules = helper.find(modules, {longname: longname});
@@ -693,6 +700,11 @@ exports.publish = function(taffyData, opts, tutorials) {
         var myClasses = helper.find(classes, {longname: longname});
         if (myClasses.length) {
             generate('Class', myClasses[0].name, myClasses, helper.longnameToUrl[longname]);
+        }
+
+        var myConfigs = helper.find(configs, {longname: longname});
+        if (myConfigs.length) {
+            generate('Definitions', myConfigs[0].name, myConfigs, helper.longnameToUrl[longname]);
         }
 
         var myNamespaces = helper.find(namespaces, {longname: longname});

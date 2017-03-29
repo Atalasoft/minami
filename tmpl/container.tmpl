@@ -50,7 +50,7 @@
         <?js doc.modules.forEach(function(module) { ?>
             <?js= self.partial('method.tmpl', module) ?>
         <?js }) ?>
-    <?js } else if (doc.kind === 'class') { ?>
+    <?js } else if (doc.kind === 'class' && !doc.atalaconfig) { ?>
         <?js= self.partial('method.tmpl', doc) ?>
     <?js } else { ?>
         <?js if (doc.description) { ?>
@@ -126,38 +126,30 @@
             });
         }
         if (members && members.length && members.forEach) {
+            sortDeprecated(members);
+            members = flattenMembers(doc, members);
     ?>
-        <h3 class="subsection-title">Members</h3>
+        <?js if (!doc.atalaconfig) { ?>
+            <h3 class="subsection-title">Members</h3>
+        <?js } ?>
 
         <?js members.forEach(function(p) {
             // list non-deprecated members first
-            if (!p.deprecated && !p.inherited) { ?>
+            if (!p.inherited) { ?>
             <?js= self.partial('members.tmpl', p) ?>
         <?js }}); ?>
-
-        <?js members.forEach(function(p) {
-            // list deprecated members at the end
-            if (p.deprecated && !p.inherited) { ?>
-            <?js= self.partial('members.tmpl', p) ?>
-        <?js }}); ?>
-
     <?js } ?>
 
     <?js
         var methods = self.find({kind: 'function', memberof: isGlobalPage ? {isUndefined: true} : doc.longname});
         if (methods && methods.length && methods.forEach) {
+            sortDeprecated(methods);
     ?>
         <h3 class="subsection-title">Methods</h3>
 
         <?js methods.forEach(function(m) {
             // list non-deprecated methods first
-            if (!m.deprecated && !m.inherited) { ?>
-            <?js= self.partial('method.tmpl', m) ?>
-        <?js }}); ?>
-
-        <?js methods.forEach(function(m) {
-            // list deprecated methods at the end
-            if (m.deprecated && !m.inherited) { ?>
+            if (!m.inherited) { ?>
             <?js= self.partial('method.tmpl', m) ?>
         <?js }}); ?>
 
@@ -198,4 +190,48 @@
 </section>
 <?js } ?>
 
+<?js
+function flattenMembers(doc, members){
+    /* Atalasoft: we want config structure to appear like typedef but each member be addressable. */
+    if (!doc.atalaconfig)
+        return members;
+
+    var result = [];
+    var surrogateParent = {
+        "id": `${doc.id}config`,
+        "name": `${doc.name}`,
+        "kind": "member",
+        "memberof": doc.longname,
+        "scope": "static",
+        "atalaconfig": true,
+        "properties": []
+    };
+
+    members.forEach(m => {
+        if (m.properties && m.properties.length){
+            m.properties.forEach(p => {
+                let defaults = { id: m.id, deprecated: p.deprecated };
+                surrogateParent.properties.push(Object.assign(defaults, p));
+            });
+        } else {
+            result.push(m);
+        }
+    });
+
+    if (surrogateParent.properties.length)
+        result.splice(0, 0, surrogateParent);
+
+    return result;
+ }
+
+ function sortDeprecated(members){
+     members.sort((first, second) => {
+         if (!!first.deprecated ^ !!second.deprecated)
+             return first.deprecated ? 1 : -1; // they are not same, put deprecated to the end
+         else
+             return 0; // they are same
+     });
+  };
+
+ ?>
 <?js }); ?>
