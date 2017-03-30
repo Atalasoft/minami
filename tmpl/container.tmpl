@@ -20,17 +20,19 @@
 <section>
 
 <header>
-    <?js if (!doc.longname || doc.kind !== 'module') { ?>
-        <h2><?js if (doc.ancestors && doc.ancestors.length) { ?>
-            <span class="ancestors"><?js= doc.ancestors.join('') ?></span>
-        <?js } ?>
-        <?js= doc.name ?>
-        <?js if (doc.variation) { ?>
-            <sup class="variation"><?js= doc.variation ?></sup>
-        <?js } ?></h2>
-        <?js if (doc.classdesc) { ?>
-            <div class="class-description"><?js= doc.classdesc ?></div>
-        <?js } ?>
+    <?js if (!doc.longname || doc.kind !== 'module') {
+        if (!doc.atalaconfig) { ?>
+            <h2><?js if (doc.ancestors && doc.ancestors.length) { ?>
+                <span class="ancestors"><?js= doc.ancestors.join('') ?></span>
+            <?js } ?>
+            <?js= doc.name ?>
+            <?js if (doc.variation) { ?>
+                <sup class="variation"><?js= doc.variation ?></sup>
+            <?js } ?></h2>
+            <?js if (doc.classdesc) { ?>
+                <div class="class-description"><?js= doc.classdesc ?></div>
+            <?js }
+         }?>
     <?js } else if (doc.kind === 'module' && doc.modules) { ?>
         <?js doc.modules.forEach(function(module) { ?>
             <?js if (module.classdesc) { ?>
@@ -207,15 +209,20 @@ function flattenMembers(doc, members){
         "properties": []
     };
 
+    var requiredProps = [];
+    var optionalProps = [];
     members.forEach(m => {
         if (m.properties && m.properties.length){
             m.properties.forEach(p => {
                 let defaults = { id: m.id, deprecated: p.deprecated };
-                surrogateParent.properties.push(Object.assign(defaults, p));
+                let container = !p.optional ? requiredProps : optionalProps;
+                container.push(Object.assign(defaults, p));
             });
         } else {
             result.push(m);
         }
+
+        surrogateParent.properties = requiredProps.concat(optionalProps);
     });
 
     if (surrogateParent.properties.length)
