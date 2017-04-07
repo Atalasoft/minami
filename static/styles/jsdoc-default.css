@@ -598,6 +598,10 @@ dl.param-type {
   footer {
     margin-left: 0;
   }
+  
+  th.default, td.default {
+    display: none;
+  }
 }
 
 @media only print {
