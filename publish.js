@@ -209,6 +209,7 @@ function generate(type, title, docs, filename, resolveLinks) {
     resolveLinks = resolveLinks === false ? false : true;
 
     var docData = {
+        productTitle: env.conf.templates.productTitle,
         type: type,
         title: title,
         docs: docs
@@ -731,6 +732,7 @@ exports.publish = function(taffyData, opts, tutorials) {
     // TODO: move the tutorial functions to templateHelper.js
     function generateTutorial(title, tutorial, filename) {
         var tutorialData = {
+            productTitle: env.conf.templates.productTitle,
             title: title,
             header: tutorial.title,
             content: tutorial.parse(),
